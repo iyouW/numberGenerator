@@ -4,7 +4,7 @@ namespace numberPool.Infra.Redis
 
     public interface IRedisClient
     {
-        ConnectionMultiplexer Connection{get;}
+        ConnectionMultiplexer Connection{ get; }
         IDatabase GetDatabase(int db = -1, object asyncState = null);
 
     }
