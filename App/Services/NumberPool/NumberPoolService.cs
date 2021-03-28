@@ -32,14 +32,14 @@ namespace numberPool.App.Services.NumberPool
             var randon = new Random(1);
             while(true)
             {
+                if(await db.HashLengthAsync(REDIS_KEY) >= MAX_NUMBER)
+                {
+                    return -1;
+                }
                 var number = Math.Round(randon.NextDouble() * 10_000_000_000) % MAX_NUMBER;
                 if(await db.HashSetAsync(REDIS_KEY, number, 1 , StackExchange.Redis.When.NotExists))
                 {
                     return (long)number;
-                }
-                if(await db.HashLengthAsync(REDIS_KEY) >= MAX_NUMBER)
-                {
-                    return -1;
                 }
             }
         }
