@@ -29,18 +29,15 @@ namespace numberPool.App.Services.NumberPool
         {
             var db = _redis.GetDatabase();
             var randon = new Random(1);
-            while(true)
+            while(await db.HashLengthAsync(REDIS_KEY) >= MAX_NUMBER)
             {
-                if(await db.HashLengthAsync(REDIS_KEY) >= MAX_NUMBER)
-                {
-                    return -1;
-                }
                 var number = Math.Round(randon.NextDouble() * 10_000_000_000) % MAX_NUMBER;
                 if(await db.HashSetAsync(REDIS_KEY, number, 1 , StackExchange.Redis.When.NotExists))
                 {
                     return (long)number;
                 }
             }
+            return -1;
         }
 
         public async Task ReturnAsync(long number)
