@@ -30,14 +30,9 @@ namespace numberPool.App.Services.NumberPool
         {
             var db = _redis.GetDatabase();
             var randon = new Random(1);
-            return await GetNumberAsync(db,randon);
-        }
-
-        private async Task<long> GetNumberAsync(IDatabase db, Random randon)
-        {
             while(true)
             {
-                var number = Math.Round(randon.NextDouble() * 1_000_000_000) % MAX_NUMBER;
+                var number = Math.Round(randon.NextDouble() * 10_000_000_000) % MAX_NUMBER;
                 if(await db.HashSetAsync(REDIS_KEY, number, 1 , StackExchange.Redis.When.NotExists))
                 {
                     return (long)number;
@@ -52,7 +47,7 @@ namespace numberPool.App.Services.NumberPool
         public async Task ReturnAsync(long number)
         {
             var db = _redis.GetDatabase();
-            await db.StringSetBitAsync(REDIS_KEY, number, false);
+            await db.HashDeleteAsync(REDIS_KEY, number);
         }
     }
 }
