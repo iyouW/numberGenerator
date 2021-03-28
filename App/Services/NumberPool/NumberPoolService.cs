@@ -7,11 +7,11 @@ namespace numberPool.App.Services.NumberPool
     using RedLockNet.SERedis;
     using RedLockNet.SERedis.Configuration;
     using System.Collections.Generic;
+    using StackExchange.Redis;
     
     public class NumberPoolService : INumberPoolService
     {
-        public const string REDIS_KEY = "31_TRTC_ROOM_TEST_2";
-        private const string RESOURCE_KEY = "31_TRTC_ROOM_MUBER";
+        public const string REDIS_KEY = "31_TRTC_ROOM_TEST_11";
 
         //trtc max room number
         public const long MAX_NUMBER = 4294967294;
@@ -29,19 +29,20 @@ namespace numberPool.App.Services.NumberPool
         public async Task<long> RentAsync()
         {
             var db = _redis.GetDatabase();
-            if(!await db.KeyExistsAsync(REDIS_KEY))
+            var randon = new Random(1);
+            return await GetNumberAsync(db,randon);
+        }
+
+        private async Task<long> GetNumberAsync(IDatabase db, Random randon)
+        {
+            while(true)
             {
-                await db.StringSetBitAsync(REDIS_KEY, MAX_NUMBER, false);
-            }
-            using(var redLock = await _redLockFactory.CreateLockAsync(RESOURCE_KEY, TimeSpan.FromSeconds(10)))
-            {
-                if(redLock.IsAcquired)
+                var number = Math.Round(randon.NextDouble() * 1_000_000_000) % MAX_NUMBER;
+                if(await db.HashSetAsync(REDIS_KEY, number, 1 , StackExchange.Redis.When.NotExists))
                 {
-                    var res = await db.StringBitPositionAsync(REDIS_KEY, false);
-                    await db.StringSetBitAsync(REDIS_KEY, res, true);
-                    return res;
+                    return (long)number;
                 }
-                else
+                if((await db.HashKeysAsync(REDIS_KEY)).LongLength >= MAX_NUMBER)
                 {
                     return -1;
                 }
