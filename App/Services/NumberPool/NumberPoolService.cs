@@ -7,11 +7,10 @@ namespace numberPool.App.Services.NumberPool
     using RedLockNet.SERedis;
     using RedLockNet.SERedis.Configuration;
     using System.Collections.Generic;
-    using StackExchange.Redis;
     
     public class NumberPoolService : INumberPoolService
     {
-        public const string REDIS_KEY = "31_TRTC_ROOM_TEST_11";
+        public const string REDIS_KEY = "31_TRTC_ROOM_TEST_16";
 
         //trtc max room number
         public const long MAX_NUMBER = 4294967294;
