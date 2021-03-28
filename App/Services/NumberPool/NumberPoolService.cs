@@ -37,7 +37,7 @@ namespace numberPool.App.Services.NumberPool
                 {
                     return (long)number;
                 }
-                if((await db.HashKeysAsync(REDIS_KEY)).LongLength >= MAX_NUMBER)
+                if(await db.HashLengthAsync(REDIS_KEY) >= MAX_NUMBER)
                 {
                     return -1;
                 }
